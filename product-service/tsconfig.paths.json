@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@functions/*": ["src/functions/*"],
+      "@utils/*": ["src/utils/*"],
+      "@errors": ["src/utils/errors/index.ts"],
+      "@errors/*": ["src/utils/errors/*"],
+      "@contracts/*": ["src/contracts/*"],
+      "@schemas/*": ["src/schemas/*"],
+      "@mocks/*": ["src/mocks/*"],
+      "@db/*": ["src/db/*"]
+    }
+  }
+}
