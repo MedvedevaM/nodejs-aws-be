@@ -5,7 +5,10 @@
   "main": "serverless.ts",
   "scripts": {
     "test": "jest",
-    "deploy": "sls deploy"
+    "deploy": "sls deploy",
+    "upload-test-data": "aws dynamodb batch-execute-statement --statements file://./src/mocks/testDataBatch.json",
+    "test-getProductById-locally": "serverless invoke --function getProductById --data '{ \"pathParameters\": {\"productId\": \"7567ec4b-b10c-48c5-9345-fc73c48a80a1\"}}'",
+    "test-getProductsList-locally": "serverless invoke --function getProductsList"
   },
   "engines": {
     "node": ">=14.15.0"
@@ -14,7 +17,8 @@
     "@middy/core": "^2.5.3",
     "@middy/http-json-body-parser": "^2.5.3",
     "ajv": "^8.11.0",
-    "ajv-formats": "^2.1.1"
+    "ajv-formats": "^2.1.1",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.19.1",

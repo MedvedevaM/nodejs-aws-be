@@ -5,9 +5,11 @@ export const errorHandler = <T>(
 ) => {
     return async (event: APIGatewayEvent) => {
         try {
+            console.log(event);
             const result = await callback(event);
             return formatJsonApiSuccessResponse(result);
         } catch (error) {
+            console.log(error);
             return formatJsonApiFailureResponse(error);
         }
     };
