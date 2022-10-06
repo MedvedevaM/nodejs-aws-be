@@ -1,0 +1,26 @@
+[    
+    {
+        "Statement": "INSERT INTO products value {'id':?,'title':?,'description':?,'price':?}",
+        "Parameters": [
+            {"S": "7567ec4b-b10c-48c5-9345-fc73c48a80aa"}, {"S": "Olej kokosowy"}, {"S": "Olej kokosowy"}, {"N": "24"}
+        ]
+    },
+    {
+        "Statement": "INSERT INTO stocks value {'product_id':?,'count':?}",
+        "Parameters": [
+            {"S": "7567ec4b-b10c-48c5-9345-fc73c48a80aa"}, {"N": "2"}
+        ]
+    },
+    {
+        "Statement": "INSERT INTO products value {'id':?,'title':?,'description':?,'price':?}",
+        "Parameters": [
+            {"S": "7567ec4b-b10c-48c5-9345-fc73c48a80a1"}, {"S": "Zestaw Olej dla dziecka"}, {"S": "Zestaw Olej dla dziecka + Naklejki gratis Olini"}, {"N": "15"}
+        ]
+    },
+    {
+        "Statement": "INSERT INTO stocks value {'product_id':?,'count':?}",
+        "Parameters": [
+            {"S": "7567ec4b-b10c-48c5-9345-fc73c48a80a1"}, {"N": "5"}
+        ]
+    }
+]

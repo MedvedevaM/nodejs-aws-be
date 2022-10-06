@@ -6,6 +6,7 @@
       "@utils/*": ["src/utils/*"],
       "@errors": ["src/utils/errors/index.ts"],
       "@errors/*": ["src/utils/errors/*"],
+      "@validation": ["src/utils/validation/index.ts"],
       "@contracts/*": ["src/contracts/*"],
       "@schemas/*": ["src/schemas/*"],
       "@mocks/*": ["src/mocks/*"],
