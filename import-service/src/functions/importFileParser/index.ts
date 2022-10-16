@@ -1,7 +1,9 @@
 import { APIGatewayProxyHandler, S3Event } from "aws-lambda";
-import { S3 } from "aws-sdk";
+import { SQS, S3 } from "aws-sdk";
 import { errorHandler } from "@errors/errorHandler";
 const csv = require("csv-parser");
+
+const SQS_QUEUE = process.env.SQS_QUEUE;
 
 export const importFileParser = async (event: S3Event): Promise<void> => {
   for (const record of event.Records) {
@@ -14,26 +16,29 @@ export const importFileParser = async (event: S3Event): Promise<void> => {
     };
     const s3Stream = s3.getObject(params).createReadStream();
 
+    const sqs = new SQS();
+
+    const products = [];
     const result = await new Promise((resolve, reject) => {
       s3Stream
-        .pipe(csv())
+        .pipe(csv({ separator: ';' }))
         .on('error', error => reject(error))
-        .on('data', row => console.log(row))
+        .on('data', async (row) => {
+          products.push(row);
+        })
         .on('end', async () => {
-          await s3.copyObject(mapCopyParams(BUCKET_NAME, key)).promise();
-          await s3.deleteObject(params).promise();
-          resolve(`Read stream of ${key} file is ended, file is moved to 'parsed' folder`);
+          resolve(`Read stream of ${key} file is ended, products are published to SQS queue`);
         });
     });
     console.log(result);
-  }
-};
 
-const mapCopyParams = (bucketName, initialKey) => {
-  return {
-    Bucket: bucketName,
-    CopySource: `${bucketName}/${initialKey}`,
-    Key: initialKey.replace('uploaded', 'parsed')
+    for (const product of products) {
+      const sqsResult = await sqs.sendMessage({
+        QueueUrl: SQS_QUEUE,
+        MessageBody: JSON.stringify(product)
+      }).promise();
+      console.log(`SQS result: ${JSON.stringify(sqsResult)}`);
+    }
   }
 };
 
