@@ -4,6 +4,7 @@ const serverlessConfiguration: AWS = {
   service: 'import-service',
   frameworkVersion: '3',
   plugins: ['serverless-esbuild'],
+  useDotenv: true,
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -15,6 +16,16 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      SQS_QUEUE: {
+        Ref: 'catalogItemsQueue'
+      },
+      SNS_TOPIC: {
+        Ref: 'createProductTopic'
+      },
+      PRODUCTS_TABLE: '${env:PRODUCTS_TABLE}',
+      STOCKS_TABLE: '${env:STOCKS_TABLE}',
+      FIRST_EMAIL: '${env:FIRST_EMAIL}',
+      SECOND_EMAIL: '${env:SECOND_EMAIL}',
     },
     iam: {
       role: {
@@ -25,6 +36,34 @@ const serverlessConfiguration: AWS = {
               "s3:*"
             ],
             Resource: ['arn:aws:s3:::rss-import-service/*'],
+          },
+          {
+            Effect: "Allow",
+            Action: [
+              "sqs:*"
+            ],
+            Resource: [{
+              'Fn::GetAtt': ['catalogItemsQueue', 'Arn']
+            }],
+          },
+          {
+            Effect: "Allow",
+            Action: [
+              "sns:*"
+            ],
+            Resource: {
+              Ref: 'createProductTopic'
+            },
+          },
+          {
+            Effect: "Allow",
+            Action: [
+              "dynamodb:PutItem"
+            ],
+            Resource: [
+              'arn:aws:dynamodb:eu-west-1:*:table/products',
+              'arn:aws:dynamodb:eu-west-1:*:table/stocks'
+            ],
           },
         ]
       }
@@ -45,7 +84,7 @@ const serverlessConfiguration: AWS = {
                 }
               }
             },
-            }
+          }
         },
       ]
     },
@@ -63,6 +102,58 @@ const serverlessConfiguration: AWS = {
           },
         },
       ]
+    },
+    catalogBatchProcess: {
+      handler: 'src/functions/catalogBatchProcess/index.handler',
+      events: [
+        {
+          sqs: {
+            batchSize: 5,
+            arn: {
+              'Fn::GetAtt': ['catalogItemsQueue', 'Arn']
+            }
+          }
+        },
+      ]
+    },
+  },
+  resources: {
+    Resources: {
+      catalogItemsQueue: {
+        Type: "AWS::SQS::Queue",
+        Properties: {
+          QueueName: 'catalogItemsQueue',
+        }
+      },
+      createProductTopic: {
+        Type: "AWS::SNS::Topic",
+        Properties: {
+          TopicName: 'createProductTopic',
+        }
+      },
+      SNSsubscription: {
+        Type: "AWS::SNS::Subscription",
+        Properties: {
+          Endpoint: '${env:FIRST_EMAIL}',
+          Protocol: "email",
+          TopicArn: {
+            Ref: 'createProductTopic'
+          }
+        }
+      },
+      SpecialSNSsubscription: {
+        Type: "AWS::SNS::Subscription",
+        Properties: {
+          Endpoint: '${env:SECOND_EMAIL}',
+          Protocol: "email",
+          TopicArn: {
+            Ref: 'createProductTopic'
+          },
+          FilterPolicy: {
+            title: ["Special"]
+          }
+        }
+      }
     }
   },
   package: { individually: true },
