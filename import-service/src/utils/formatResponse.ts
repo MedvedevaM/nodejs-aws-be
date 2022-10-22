@@ -7,6 +7,7 @@ const formatJsonApiResponse = <T>(response: T | Error, statusCode = 200) => {
         headers: {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Credentials': true,
+            'Access-Control-Allow-Headers': 'Authorization'
         },
         statusCode,
         body: JSON.stringify(response),
