@@ -40,6 +40,13 @@ const serverlessConfiguration: AWS = {
           {
             Effect: "Allow",
             Action: [
+              "lambda:InvokeFunction"
+            ],
+            Resource: ['arn:aws:lambda:eu-west-1:485082172910:function:authorization-service-dev-basicAuthorizer'],
+          },
+          {
+            Effect: "Allow",
+            Action: [
               "sqs:*"
             ],
             Resource: [{
@@ -84,6 +91,16 @@ const serverlessConfiguration: AWS = {
                 }
               }
             },
+            cors: {
+              headers: ['Authorization'],
+            },
+            authorizer: {
+              arn: 'arn:aws:lambda:eu-west-1:485082172910:function:authorization-service-dev-basicAuthorizer',
+              identitySource: 'method.request.header.Authorization',
+              resultTtlInSeconds: 0,
+              type: 'token',
+              managedExternally: false
+            }
           }
         },
       ]
