@@ -10,7 +10,6 @@ export const redirect = async (request: express.Request) => {
     if (!method || !allowedMethods.includes(method)) {
         throw new MethodNotAllowedError('Provided HTTP method is not allowed');
     }
-
     const response = await axios({
         method,
         url: getUrl(originalUrl),
@@ -27,8 +26,8 @@ export const redirect = async (request: express.Request) => {
 
 function getUrl(originalUrl: string): string | undefined {
     let url: string | undefined;
-    if (originalUrl.startsWith('/product')) {
-        url = process.env.product;
+    if (originalUrl.startsWith('/products')) {
+        url = process.env.products;
     }
 
     if (originalUrl.startsWith('/cart')) {

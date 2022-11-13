@@ -4,6 +4,8 @@ import { BaseError } from './utils/errors';
 
 const app: express.Application = express();
 
+app.use(express.json());
+
 const PORT = 4000;
 app.set('port', PORT);
 
